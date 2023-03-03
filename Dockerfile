@@ -43,10 +43,11 @@ WORKDIR /build
 COPY ton-prepare.sh .
 RUN /bin/bash ./ton-prepare.sh
 COPY ton-build.sh .
+RUN /bin/bash ./ton-build.sh
+COPY ton-export.sh .
 
-# 
-# Compilator entry
+#
+# Export
 #
 
-WORKDIR /build
-CMD ["/bin/bash", "/build/ton-build.sh"]
+CMD ["/bin/bash", "./ton-export.sh"]

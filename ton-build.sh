@@ -32,12 +32,3 @@ emcmake cmake -DUSE_EMSCRIPTEN=ON \
               ..
 cp -R ../crypto/smartcont ../crypto/fift/lib crypto
 emmake make -j4 funcfiftlib
-
-#
-# Export
-#
-
-echo -n "module.exports = { FuncFiftLibWasm: '" > crypto/funcfiftlib.wasm.js
-cat crypto/funcfiftlib.wasm | base64 --wrap=0 >> crypto/funcfiftlib.wasm.js
-echo -n "' };" >> crypto/funcfiftlib.wasm.js
-cp crypto/funcfiftlib.wasm crypto/funcfiftlib.js crypto/funcfiftlib.wasm.js /output

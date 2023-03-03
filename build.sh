@@ -4,9 +4,7 @@ set -e
 # Build docker environment
 docker build . -t ton-wasm-builder
 
-# Prepare output directory
+# Export
 rm -fr ./output
 mkdir ./output
-
-# Build artifacts
-docker run -v "${pwd}/output:/output" ton-wasm-builder
+docker run -v "$(pwd)/output:/output" ton-wasm-builder
