@@ -17,23 +17,19 @@ RUN ./emsdk install 3.1.18 && ./emsdk activate 3.1.18
 #
 
 WORKDIR /build
-COPY em-zlib.sh .
-WORKDIR /build
-RUN git clone --depth=1 https://github.com/madler/zlib.git
-WORKDIR /build/zlib
-RUN /bin/bash ../em-zlib.sh
+RUN git clone --depth=1 https://github.com/madler/zlib.git /build/zlib
+COPY build-zlib.sh .
+RUN /bin/bash ./build-zlib.sh
 
 #
 # OpenSSL
 #
 
 WORKDIR /build
-COPY em-openssl.sh .
-WORKDIR /build
-RUN git clone --depth=1 --branch OpenSSL_1_1_1j https://github.com/openssl/openssl.git
-WORKDIR /build/openssl
-RUN ./config && make -j4
-RUN /bin/bash ../em-openssl.sh
+RUN git clone --depth=1 --branch OpenSSL_1_1_1j https://github.com/openssl/openssl.git /build/openssl
+RUN git clone --depth=1 --branch OpenSSL_1_1_1j https://github.com/openssl/openssl.git /build/openssl-es
+COPY build-openssl.sh .
+RUN /bin/bash ./build-openssl.sh
 
 #
 # TON
@@ -44,11 +40,13 @@ WORKDIR /build/ton
 RUN git clone --recursive https://github.com/dvlkv/ton-blockchain.git .
 RUN git checkout b0b6e5203f46d82b3a6c16037c5031746dc75193
 WORKDIR /build
-COPY em-ton.sh .
+COPY ton-prepare.sh .
+RUN /bin/bash ./ton-prepare.sh
+COPY ton-build.sh .
 
 # 
 # Compilator entry
 #
 
 WORKDIR /build
-CMD ["/bin/bash", "/build/em-ton.sh"]
+CMD ["/bin/bash", "/build/ton-build.sh"]

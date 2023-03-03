@@ -1,6 +1,19 @@
 set -e
+
+#
+# Native
+#
+
+cd /build/openssl
+./config
+make -j4
+
+#
+# Wasm
+#
+
+cd /build/openssl-es
 source /build/emsdk/emsdk_env.sh
-make clean
 emconfigure ./Configure linux-generic32 no-shared no-dso no-engine no-unit-test no-ui
 sed -i 's/CROSS_COMPILE=.*/CROSS_COMPILE=/g' Makefile
 sed -i 's/-ldl//g' Makefile
