@@ -39,9 +39,6 @@ RUN mkdir -p /build/ton
 WORKDIR /build/ton
 RUN git clone --recursive https://github.com/dvlkv/ton-blockchain.git .
 RUN git checkout b0b6e5203f46d82b3a6c16037c5031746dc75193
-WORKDIR /build/ton/crypto
-COPY ton.patch .
-RUN patch CMakeLists.txt < ton.patch
 WORKDIR /build
 COPY ton-prepare.sh .
 RUN /bin/bash ./ton-prepare.sh
