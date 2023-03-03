@@ -1,0 +1,10 @@
+--- CMakeLists.txt	2023-03-03 16:24:01
++++ CMakeLists.edit.txt	2023-03-03 16:30:54
+@@ -340,6 +340,7 @@
+   target_link_options(funcfiftlib PRIVATE -sALLOW_MEMORY_GROWTH=1)
+   target_link_options(funcfiftlib PRIVATE -sALLOW_TABLE_GROWTH=1)
+   target_link_options(funcfiftlib PRIVATE --embed-file ${CMAKE_CURRENT_SOURCE_DIR}/fift/lib@/fiftlib)
++  target_link_options(funcfiftlib PRIVATE -sENVIRONMENT=web)
+   target_link_options(funcfiftlib PRIVATE -fexceptions)
+   target_compile_options(funcfiftlib PRIVATE -fexceptions)
+ endif()
