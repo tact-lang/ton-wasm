@@ -37,11 +37,10 @@ RUN /bin/bash ./build-openssl.sh
 
 RUN mkdir -p /build/ton
 WORKDIR /build/ton
-RUN git clone --recursive https://github.com/dvlkv/ton-blockchain.git .
-RUN git checkout b0b6e5203f46d82b3a6c16037c5031746dc75193
-WORKDIR /build/ton/crypto
+RUN git clone --recursive https://github.com/ton-blockchain/ton.git .
+RUN git checkout e37583e5e6e8cd0aebf5142ef7d8db282f10692b
 COPY ton.patch .
-RUN patch CMakeLists.txt < ton.patch
+RUN git apply ton.patch
 WORKDIR /build
 COPY ton-prepare.sh .
 RUN /bin/bash ./ton-prepare.sh
