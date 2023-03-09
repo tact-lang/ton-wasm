@@ -31,4 +31,5 @@ emcmake cmake -DUSE_EMSCRIPTEN=ON \
               -DCMAKE_CXX_FLAGS="-sUSE_ZLIB=1" \
               ..
 cp -R ../crypto/smartcont ../crypto/fift/lib crypto
-emmake make -j4 funcfiftlib
+emmake make -j$(nproc) emulator-emscripten
+emmake make -j$(nproc) funcfiftlib

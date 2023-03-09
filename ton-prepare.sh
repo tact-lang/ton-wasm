@@ -16,5 +16,5 @@ cmake -DCMAKE_BUILD_TYPE=Release \
       -DOPENSSL_CRYPTO_LIBRARY=$OPENSSL_DIR/libcrypto.so \
       -DOPENSSL_SSL_LIBRARY=$OPENSSL_DIR/libssl.so \
       ..
-make -j4 fift
+make -j4 gen_fif fift
 rm -rf /build/ton/build/*
