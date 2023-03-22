@@ -40,7 +40,9 @@ WORKDIR /build/ton
 RUN git clone --recursive https://github.com/ton-blockchain/ton.git .
 RUN git checkout e37583e5e6e8cd0aebf5142ef7d8db282f10692b
 COPY ton.patch .
+COPY ton2.patch .
 RUN git apply ton.patch
+RUN git apply ton2.patch
 WORKDIR /build
 COPY ton-prepare.sh .
 RUN /bin/bash ./ton-prepare.sh
