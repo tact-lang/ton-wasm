@@ -1,9 +1,16 @@
 set -e
-cd /build/ton/build/crypto
-cp funcfiftlib.wasm funcfiftlib.js tlbc.wasm tlbc.js /output/
-cd /build/ton/build/emulator
-cp emulator-emscripten.wasm emulator-emscripten.js /output/
-cd /output/
+mkdir -p /output/wasm/
+mkdir -p /output/js/
+cp /build/output/wasm/funcfiftlib.wasm \
+   /build/output/wasm/funcfiftlib.js \
+   /build/output/wasm/tlbc.wasm \
+   /build/output/wasm/tlbc.js \
+   /build/output/wasm/emulator-emscripten.wasm \
+   /build/output/wasm/emulator-emscripten.js \
+   /output/wasm
+cp /build/output/js/emulator-emscripten.js \
+   /output/js
+cd /output/wasm
 
 # Create emulator-emscripten.wasm.js
 echo -n "module.exports = { wasmBinary: '" > emulator-emscripten.wasm.js
