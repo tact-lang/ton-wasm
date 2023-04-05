@@ -33,6 +33,7 @@ emcmake cmake -DUSE_EMSCRIPTEN=ON \
               -DOPENSSL_SSL_LIBRARY=$OPENSSL_DIR/libssl.a \
               -DCMAKE_TOOLCHAIN_FILE=$EMSDK_DIR/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake \
               -DCMAKE_CXX_FLAGS="-sUSE_ZLIB=1" \
+              --graphviz=/build/output/deps.dot \
               ..
 cp -R ../crypto/smartcont ../crypto/fift/lib crypto
 emmake make -j$(nproc) emulator-emscripten

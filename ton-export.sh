@@ -1,6 +1,7 @@
 set -e
 mkdir -p /output/wasm/
 mkdir -p /output/js/
+cp /build/output/deps.dot /output
 cp /build/output/wasm/funcfiftlib.wasm \
    /build/output/wasm/funcfiftlib.js \
    /build/output/wasm/tlbc.wasm \

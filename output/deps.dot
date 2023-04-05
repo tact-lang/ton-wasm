@@ -1,0 +1,241 @@
+digraph "GG" {
+node [
+  fontsize = "12"
+];
+    "node214" [ label="Tonlib" shape="box"];
+    "node223" [ label="tonlib" shape="diamond"];
+    "node214" -> "node223"[style = dotted] // Tonlib -> tonlib
+    "node149" [ label="adnllite" shape="diamond"];
+    "node223" -> "node149"[style = dashed] // tonlib -> adnllite
+    "node132" [ label="keys" shape="diamond"];
+    "node149" -> "node132" // adnllite -> keys
+    "node60" [ label="tdactor" shape="diamond"];
+    "node132" -> "node60" // keys -> tdactor
+    "node37" [ label="tdutils" shape="diamond"];
+    "node60" -> "node37" // tdactor -> tdutils
+    "node224" [ label="/build/openssl-es/libcrypto.a" shape="ellipse"];
+    "node37" -> "node224" // tdutils -> /build/openssl-es/libcrypto.a
+    "node225" [ label="/build/zlib/libz.a" shape="ellipse"];
+    "node37" -> "node225" // tdutils -> /build/zlib/libz.a
+    "node27" [ label="crc32c" shape="diamond"];
+    "node37" -> "node27"[style = dashed] // tdutils -> crc32c
+    "node141" [ label="tl-utils" shape="diamond"];
+    "node132" -> "node141" // keys -> tl-utils
+    "node107" [ label="tl_api" shape="diamond"];
+    "node141" -> "node107" // tl-utils -> tl_api
+    "node107" -> "node37" // tl_api -> tdutils
+    "node163" [ label="ton_crypto" shape="diamond"];
+    "node141" -> "node163" // tl-utils -> ton_crypto
+    "node163" -> "node224" // ton_crypto -> /build/openssl-es/libcrypto.a
+    "node88" [ label="tddb_utils" shape="diamond"];
+    "node163" -> "node88" // ton_crypto -> tddb_utils
+    "node88" -> "node60" // tddb_utils -> tdactor
+    "node88" -> "node37" // tddb_utils -> tdutils
+    "node163" -> "node37" // ton_crypto -> tdutils
+    "node226" [ label="z" shape="ellipse"];
+    "node163" -> "node226" // ton_crypto -> z
+    "node132" -> "node107" // keys -> tl_api
+    "node132" -> "node163" // keys -> ton_crypto
+    "node149" -> "node60" // adnllite -> tdactor
+    "node78" [ label="tdnet" shape="diamond"];
+    "node149" -> "node78" // adnllite -> tdnet
+    "node78" -> "node60" // tdnet -> tdactor
+    "node103" [ label="tl_lite_api" shape="diamond"];
+    "node149" -> "node103" // adnllite -> tl_lite_api
+    "node103" -> "node37" // tl_lite_api -> tdutils
+    "node149" -> "node163" // adnllite -> ton_crypto
+    "node210" [ label="emulator_static" shape="diamond"];
+    "node223" -> "node210"[style = dashed] // tonlib -> emulator_static
+    "node172" [ label="smc-envelope" shape="diamond"];
+    "node210" -> "node172" // emulator_static -> smc-envelope
+    "node172" -> "node37"[style = dashed] // smc-envelope -> tdutils
+    "node167" [ label="ton_block" shape="diamond"];
+    "node172" -> "node167"[style = dashed] // smc-envelope -> ton_block
+    "node167" -> "node60" // ton_block -> tdactor
+    "node167" -> "node37" // ton_block -> tdutils
+    "node167" -> "node107" // ton_block -> tl_api
+    "node167" -> "node163" // ton_block -> ton_crypto
+    "node172" -> "node163" // smc-envelope -> ton_crypto
+    "node210" -> "node167" // emulator_static -> ton_block
+    "node210" -> "node163" // emulator_static -> ton_crypto
+    "node200" [ label="lite-client-common" shape="diamond"];
+    "node223" -> "node200"[style = dashed] // tonlib -> lite-client-common
+    "node200" -> "node149" // lite-client-common -> adnllite
+    "node200" -> "node60" // lite-client-common -> tdactor
+    "node200" -> "node37" // lite-client-common -> tdutils
+    "node139" [ label="tl-lite-utils" shape="diamond"];
+    "node200" -> "node139" // lite-client-common -> tl-lite-utils
+    "node139" -> "node103" // tl-lite-utils -> tl_lite_api
+    "node139" -> "node163" // tl-lite-utils -> ton_crypto
+    "node200" -> "node107" // lite-client-common -> tl_api
+    "node200" -> "node103" // lite-client-common -> tl_lite_api
+    "node200" -> "node167" // lite-client-common -> ton_block
+    "node200" -> "node163" // lite-client-common -> ton_crypto
+    "node223" -> "node172"[style = dashed] // tonlib -> smc-envelope
+    "node223" -> "node60"[style = dashed] // tonlib -> tdactor
+    "node223" -> "node37" // tonlib -> tdutils
+    "node223" -> "node139"[style = dashed] // tonlib -> tl-lite-utils
+    "node223" -> "node103"[style = dashed] // tonlib -> tl_lite_api
+    "node102" [ label="tl_tonlib_api" shape="diamond"];
+    "node223" -> "node102" // tonlib -> tl_tonlib_api
+    "node102" -> "node37" // tl_tonlib_api -> tdutils
+    "node223" -> "node167"[style = dashed] // tonlib -> ton_block
+    "node223" -> "node163"[style = dashed] // tonlib -> ton_crypto
+    "node216" [ label="TonlibJson" shape="box"];
+    "node220" [ label="tonlibjson" shape="diamond"];
+    "node216" -> "node220"[style = dotted] // TonlibJson -> tonlibjson
+    "node221" [ label="tonlibjson_private" shape="diamond"];
+    "node220" -> "node221"[style = dashed] // tonlibjson -> tonlibjson_private
+    "node101" [ label="tl_tonlib_api_json" shape="diamond"];
+    "node221" -> "node101"[style = dashed] // tonlibjson_private -> tl_tonlib_api_json
+    "node101" -> "node37" // tl_tonlib_api_json -> tdutils
+    "node101" -> "node102" // tl_tonlib_api_json -> tl_tonlib_api
+    "node221" -> "node223" // tonlibjson_private -> tonlib
+    "node152" [ label="adjust-block" shape="house"];
+    "node178" [ label="fift-lib" shape="diamond"];
+    "node152" -> "node178" // adjust-block -> fift-lib
+    "node178" -> "node37" // fift-lib -> tdutils
+    "node178" -> "node167" // fift-lib -> ton_block
+    "node178" -> "node163" // fift-lib -> ton_crypto
+    "node176" [ label="ton_db" shape="diamond"];
+    "node178" -> "node176" // fift-lib -> ton_db
+    "node87" [ label="tddb" shape="diamond"];
+    "node176" -> "node87" // ton_db -> tddb
+    "node87" -> "node60" // tddb -> tdactor
+    "node87" -> "node88" // tddb -> tddb_utils
+    "node87" -> "node37" // tddb -> tdutils
+    "node176" -> "node37" // ton_db -> tdutils
+    "node176" -> "node163" // ton_db -> ton_crypto
+    "node10" [ label="git" shape="diamond"];
+    "node152" -> "node10" // adjust-block -> git
+    "node152" -> "node167" // adjust-block -> ton_block
+    "node152" -> "node163" // adjust-block -> ton_crypto
+    "node68" [ label="benchmark" shape="house"];
+    "node68" -> "node60"[style = dashed] // benchmark -> tdactor
+    "node154" [ label="create-state" shape="house"];
+    "node154" -> "node178" // create-state -> fift-lib
+    "node154" -> "node10" // create-state -> git
+    "node154" -> "node167" // create-state -> ton_block
+    "node154" -> "node163" // create-state -> ton_crypto
+    "node154" -> "node223" // create-state -> tonlib
+    "node160" [ label="dump-block" shape="house"];
+    "node160" -> "node178" // dump-block -> fift-lib
+    "node160" -> "node10" // dump-block -> git
+    "node160" -> "node167" // dump-block -> ton_block
+    "node160" -> "node163" // dump-block -> ton_crypto
+    "node209" [ label="emulator" shape="diamond"];
+    "node209" -> "node210" // emulator -> emulator_static
+    "node208" [ label="emulator-emscripten" shape="house"];
+    "node208" -> "node209" // emulator-emscripten -> emulator
+    "node173" [ label="fift" shape="house"];
+    "node173" -> "node178" // fift -> fift-lib
+    "node173" -> "node10" // fift -> git
+    "node188" [ label="func" shape="house"];
+    "node188" -> "node10" // func -> git
+    "node168" [ label="src_parser" shape="diamond"];
+    "node188" -> "node168" // func -> src_parser
+    "node168" -> "node163" // src_parser -> ton_crypto
+    "node188" -> "node167" // func -> ton_block
+    "node188" -> "node163" // func -> ton_crypto
+    "node187" [ label="funcfiftlib" shape="house"];
+    "node187" -> "node178" // funcfiftlib -> fift-lib
+    "node187" -> "node10" // funcfiftlib -> git
+    "node187" -> "node168" // funcfiftlib -> src_parser
+    "node86" [ label="io-bench" shape="house"];
+    "node86" -> "node60" // io-bench -> tdactor
+    "node86" -> "node87" // io-bench -> tddb
+    "node86" -> "node37" // io-bench -> tdutils
+    "node199" [ label="lite-client" shape="house"];
+    "node199" -> "node149" // lite-client -> adnllite
+    "node199" -> "node10" // lite-client -> git
+    "node199" -> "node200" // lite-client -> lite-client-common
+    "node199" -> "node60" // lite-client -> tdactor
+    "node199" -> "node37" // lite-client -> tdutils
+    "node124" [ label="terminal" shape="diamond"];
+    "node199" -> "node124" // lite-client -> terminal
+    "node124" -> "node60"[style = dashed] // terminal -> tdactor
+    "node124" -> "node37"[style = dashed] // terminal -> tdutils
+    "node199" -> "node139" // lite-client -> tl-lite-utils
+    "node199" -> "node107" // lite-client -> tl_api
+    "node199" -> "node103" // lite-client -> tl_lite_api
+    "node199" -> "node167" // lite-client -> ton_block
+    "node199" -> "node163" // lite-client -> ton_crypto
+    "node52" [ label="memprof" shape="diamond"];
+    "node52" -> "node37"[style = dashed] // memprof -> tdutils
+    "node157" [ label="pow-miner" shape="house"];
+    "node157" -> "node10"[style = dashed] // pow-miner -> git
+    "node158" [ label="pow-miner-lib" shape="diamond"];
+    "node157" -> "node158"[style = dashed] // pow-miner -> pow-miner-lib
+    "node158" -> "node167" // pow-miner-lib -> ton_block
+    "node158" -> "node163" // pow-miner-lib -> ton_crypto
+    "node157" -> "node167"[style = dashed] // pow-miner -> ton_block
+    "node157" -> "node163"[style = dashed] // pow-miner -> ton_crypto
+    "node77" [ label="tcp_ping_pong" shape="house"];
+    "node77" -> "node60"[style = dashed] // tcp_ping_pong -> tdactor
+    "node77" -> "node78"[style = dashed] // tcp_ping_pong -> tdnet
+    "node96" [ label="tdtl" shape="diamond"];
+    "node5" [ label="test-bigint" shape="house"];
+    "node5" -> "node163"[style = dashed] // test-bigint -> ton_crypto
+    "node9" [ label="test-cells" shape="house"];
+    "node9" -> "node163"[style = dashed] // test-cells -> ton_crypto
+    "node18" [ label="test-ed25519" shape="house"];
+    "node18" -> "node163"[style = dashed] // test-ed25519 -> ton_crypto
+    "node161" [ label="test-ed25519-crypto" shape="house"];
+    "node161" -> "node163" // test-ed25519-crypto -> ton_crypto
+    "node6" [ label="test-fift" shape="house"];
+    "node6" -> "node178"[style = dashed] // test-fift -> fift-lib
+    "node14" [ label="test-net" shape="house"];
+    "node14" -> "node78"[style = dashed] // test-net -> tdnet
+    "node14" -> "node37"[style = dashed] // test-net -> tdutils
+    "node8" [ label="test-smartcont" shape="house"];
+    "node8" -> "node178"[style = dashed] // test-smartcont -> fift-lib
+    "node8" -> "node172"[style = dashed] // test-smartcont -> smc-envelope
+    "node8" -> "node176"[style = dashed] // test-smartcont -> ton_db
+    "node12" [ label="test-tdactor" shape="house"];
+    "node12" -> "node60"[style = dashed] // test-tdactor -> tdactor
+    "node11" [ label="test-tdutils" shape="house"];
+    "node11" -> "node52"[style = dashed] // test-tdutils -> memprof
+    "node11" -> "node37"[style = dashed] // test-tdutils -> tdutils
+    "node16" [ label="test-tonlib" shape="house"];
+    "node16" -> "node149" // test-tonlib -> adnllite
+    "node16" -> "node60" // test-tonlib -> tdactor
+    "node16" -> "node37" // test-tonlib -> tdutils
+    "node16" -> "node107" // test-tonlib -> tl_api
+    "node16" -> "node102" // test-tonlib -> tl_tonlib_api
+    "node16" -> "node167" // test-tonlib -> ton_block
+    "node16" -> "node163" // test-tonlib -> ton_crypto
+    "node16" -> "node223" // test-tonlib -> tonlib
+    "node19" [ label="test-tonlib-offline" shape="house"];
+    "node19" -> "node149" // test-tonlib-offline -> adnllite
+    "node19" -> "node178" // test-tonlib-offline -> fift-lib
+    "node19" -> "node60" // test-tonlib-offline -> tdactor
+    "node19" -> "node37" // test-tonlib-offline -> tdutils
+    "node19" -> "node107" // test-tonlib-offline -> tl_api
+    "node19" -> "node102" // test-tonlib-offline -> tl_tonlib_api
+    "node19" -> "node167" // test-tonlib-offline -> ton_block
+    "node19" -> "node163" // test-tonlib-offline -> ton_crypto
+    "node19" -> "node223" // test-tonlib-offline -> tonlib
+    "node7" [ label="test-vm" shape="house"];
+    "node7" -> "node178"[style = dashed] // test-vm -> fift-lib
+    "node7" -> "node163"[style = dashed] // test-vm -> ton_crypto
+    "node164" [ label="test-weight-distr" shape="house"];
+    "node164" -> "node178" // test-weight-distr -> fift-lib
+    "node164" -> "node10" // test-weight-distr -> git
+    "node164" -> "node167" // test-weight-distr -> ton_block
+    "node164" -> "node163" // test-weight-distr -> ton_crypto
+    "node162" [ label="tlbc" shape="house"];
+    "node162" -> "node168" // tlbc -> src_parser
+    "node162" -> "node163" // tlbc -> ton_crypto
+    "node222" [ label="tonlib-cli" shape="house"];
+    "node222" -> "node10" // tonlib-cli -> git
+    "node222" -> "node158" // tonlib-cli -> pow-miner-lib
+    "node222" -> "node60" // tonlib-cli -> tdactor
+    "node222" -> "node37" // tonlib-cli -> tdutils
+    "node222" -> "node124" // tonlib-cli -> terminal
+    "node222" -> "node223" // tonlib-cli -> tonlib
+    "node116" [ label="tonlib_generate_java_api" shape="house"];
+    "node116" -> "node96"[style = dashed] // tonlib_generate_java_api -> tdtl
+    "node76" [ label="udp_ping_pong" shape="house"];
+    "node76" -> "node60"[style = dashed] // udp_ping_pong -> tdactor
+    "node76" -> "node78"[style = dashed] // udp_ping_pong -> tdnet
+}

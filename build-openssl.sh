@@ -14,7 +14,7 @@ make -j4
 
 cd /build/openssl-es
 source /build/emsdk/emsdk_env.sh
-emconfigure ./Configure linux-generic32 no-shared no-dso no-engine no-unit-test no-ui
+emconfigure ./Configure linux-generic32 no-shared no-dso no-engine no-unit-test no-ui no-threads
 sed -i 's/CROSS_COMPILE=.*/CROSS_COMPILE=/g' Makefile
 sed -i 's/-ldl//g' Makefile
 sed -i 's/-O3/-Os/g' Makefile
