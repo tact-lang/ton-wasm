@@ -37,8 +37,7 @@ RUN /bin/bash ./build-openssl.sh
 
 RUN mkdir -p /build/ton
 WORKDIR /build/ton
-RUN git clone --recursive https://github.com/ton-blockchain/ton.git .
-RUN git checkout e37583e5e6e8cd0aebf5142ef7d8db282f10692b
+RUN git clone -b 'v2023.04' --single-branch --depth 1 --recursive https://github.com/ton-blockchain/ton.git .
 
 #
 # Build native libraries
@@ -52,13 +51,13 @@ RUN /bin/bash ./ton-prepare.sh
 # Apply patches
 #
 
-WORKDIR /build/ton
-COPY ton.patch .
-COPY ton2.patch .
-COPY ton3.patch .
-RUN git apply ton.patch
-RUN git apply ton2.patch
-RUN git apply ton3.patch
+# WORKDIR /build/ton
+# COPY ton.patch .
+# COPY ton2.patch .
+# COPY ton3.patch .
+# RUN git apply ton.patch
+# RUN git apply ton2.patch
+# RUN git apply ton3.patch
 
 #
 # Emscripten
