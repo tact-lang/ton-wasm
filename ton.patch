@@ -1,430 +1,65 @@
-From c48edb7d9d8bf7aaf604f3bcf4b54e19cd4cf359 Mon Sep 17 00:00:00 2001
-From: mrmld <die.marmelade@yandex.ru>
-Date: Wed, 15 Feb 2023 15:23:37 +0400
-Subject: [PATCH 1/5] wip: make funcfiftlib compilation compatible with modern
- compilers
+From 5217414301d71fcd40363332d9d3a1defd2020a8 Mon Sep 17 00:00:00 2001
+From: Steve Korshakov <korshakov.stepan@gmail.com>
+Date: Fri, 14 Apr 2023 13:30:49 +0100
+Subject: [PATCH 1/2] Avoid dumping stack for verbosity == 2, increase log max
+ size
 
 ---
- crypto/CMakeLists.txt | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ crypto/block/transaction.cpp | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/CMakeLists.txt b/crypto/CMakeLists.txt
-index fab75bfc..aeed7bb1 100644
---- a/crypto/CMakeLists.txt
-+++ b/crypto/CMakeLists.txt
-@@ -324,15 +324,17 @@ if (USE_EMSCRIPTEN)
-   add_executable(funcfiftlib funcfiftlib/funcfiftlib.cpp ${FUNC_LIB_SOURCE})
-   target_include_directories(funcfiftlib PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
-   target_link_libraries(funcfiftlib PUBLIC fift-lib src_parser git)
--  target_link_options(funcfiftlib PRIVATE -sEXPORTED_RUNTIME_METHODS=FS,ccall,cwrap,_malloc,free,UTF8ToString,stringToUTF8)
--  target_link_options(funcfiftlib PRIVATE -sEXPORTED_FUNCTIONS=_func_compile,_version)
-+  target_link_options(funcfiftlib PRIVATE -sEXPORTED_RUNTIME_METHODS=FS,ccall,cwrap,UTF8ToString,stringToUTF8,lengthBytesUTF8,addFunction)
-+  target_link_options(funcfiftlib PRIVATE -sEXPORTED_FUNCTIONS=_func_compile,_version,_malloc,_free,_setThrew)
-   target_link_options(funcfiftlib PRIVATE -sEXPORT_NAME=CompilerModule)
-   target_link_options(funcfiftlib PRIVATE -sERROR_ON_UNDEFINED_SYMBOLS=0)
--  target_link_options(funcfiftlib PRIVATE -sFILESYSTEM=1)
-+  target_link_options(funcfiftlib PRIVATE -sFILESYSTEM=1 -lnodefs.js)
-   target_link_options(funcfiftlib PRIVATE -Oz)
-   target_link_options(funcfiftlib PRIVATE -sIGNORE_MISSING_MAIN=1)
-   target_link_options(funcfiftlib PRIVATE -sAUTO_NATIVE_LIBRARIES=0)
-   target_link_options(funcfiftlib PRIVATE -sMODULARIZE=1)
-+  target_link_options(funcfiftlib PRIVATE -sALLOW_MEMORY_GROWTH=1)
-+  target_link_options(funcfiftlib PRIVATE -sALLOW_TABLE_GROWTH=1)
-   target_link_options(funcfiftlib PRIVATE --embed-file ${CMAKE_CURRENT_SOURCE_DIR}/fift/lib@/fiftlib)
-   target_compile_options(funcfiftlib PRIVATE -sDISABLE_EXCEPTION_CATCHING=0)
- endif()
-
-From cec518fdbef83b240c732ff2dfff78a030a3072f Mon Sep 17 00:00:00 2001
-From: mrmld <die.marmelade@yandex.ru>
-Date: Wed, 15 Feb 2023 15:36:04 +0400
-Subject: [PATCH 2/5] wip: add methods needed for another compiler
-
----
- crypto/CMakeLists.txt | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/crypto/CMakeLists.txt b/crypto/CMakeLists.txt
-index aeed7bb1..42bb9f9b 100644
---- a/crypto/CMakeLists.txt
-+++ b/crypto/CMakeLists.txt
-@@ -324,7 +324,7 @@ if (USE_EMSCRIPTEN)
-   add_executable(funcfiftlib funcfiftlib/funcfiftlib.cpp ${FUNC_LIB_SOURCE})
-   target_include_directories(funcfiftlib PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
-   target_link_libraries(funcfiftlib PUBLIC fift-lib src_parser git)
--  target_link_options(funcfiftlib PRIVATE -sEXPORTED_RUNTIME_METHODS=FS,ccall,cwrap,UTF8ToString,stringToUTF8,lengthBytesUTF8,addFunction)
-+  target_link_options(funcfiftlib PRIVATE -sEXPORTED_RUNTIME_METHODS=FS,ccall,cwrap,UTF8ToString,stringToUTF8,lengthBytesUTF8,addFunction,removeFunction,setValue)
-   target_link_options(funcfiftlib PRIVATE -sEXPORTED_FUNCTIONS=_func_compile,_version,_malloc,_free,_setThrew)
-   target_link_options(funcfiftlib PRIVATE -sEXPORT_NAME=CompilerModule)
-   target_link_options(funcfiftlib PRIVATE -sERROR_ON_UNDEFINED_SYMBOLS=0)
-
-From 69d8c35a68a01e89614127e013df732197e95914 Mon Sep 17 00:00:00 2001
-From: mrmld <die.marmelade@yandex.ru>
-Date: Wed, 15 Feb 2023 15:52:42 +0400
-Subject: [PATCH 3/5] fix: tdutils port config if emscripten
-
----
- tdutils/td/utils/port/config.h   | 28 +++++++++++++---------------
- tdutils/td/utils/port/platform.h | 14 ++++++++++----
- 2 files changed, 23 insertions(+), 19 deletions(-)
-
-diff --git a/tdutils/td/utils/port/config.h b/tdutils/td/utils/port/config.h
-index 77143668..f89082f3 100644
---- a/tdutils/td/utils/port/config.h
-+++ b/tdutils/td/utils/port/config.h
-@@ -28,35 +28,33 @@
-   #define TD_PORT_POSIX 1
- #endif
- 
--#if TD_LINUX || TD_ANDROID || TD_TIZEN
-+#if TD_EMSCRIPTEN
-+  #define TD_POLL_POLL 1
-+#elif TD_LINUX || TD_ANDROID || TD_TIZEN
-   #define TD_POLL_EPOLL 1
--  #define TD_EVENTFD_LINUX 1
- #elif TD_FREEBSD || TD_OPENBSD || TD_NETBSD
-   #define TD_POLL_KQUEUE 1
--  #define TD_EVENTFD_BSD 1
- #elif TD_CYGWIN
-   #define TD_POLL_SELECT 1
--  #define TD_EVENTFD_BSD 1
--#elif TD_EMSCRIPTEN
--  #define TD_POLL_POLL 1
--  // #define TD_EVENTFD_UNSUPPORTED 1
- #elif TD_DARWIN
-   #define TD_POLL_KQUEUE 1
--  #define TD_EVENTFD_BSD 1
- #elif TD_WINDOWS
-   #define TD_POLL_WINEVENT 1
--  #define TD_EVENTFD_WINDOWS 1
- #else
-   #error "Poll's implementation is not defined"
- #endif
- 
--#if TD_EMSCRIPTEN
--  // #define TD_THREAD_UNSUPPORTED 1
--  #define TD_POLL_EPOLL 1
--  #define TD_EVENTFD_UNSUPPORTED 0
--  #define TD_THREAD_PTHREAD 1
-+#if TD_LINUX || TD_ANDROID || TD_TIZEN
-   #define TD_EVENTFD_LINUX 1
--#elif TD_TIZEN || TD_LINUX || TD_DARWIN
-+#elif TD_FREEBSD || TD_OPENBSD || TD_NETBSD || TD_CYGWIN || TD_DARWIN
-+  #define TD_EVENTFD_BSD 1
-+#elif TD_WINDOWS
-+  #define TD_EVENTFD_WINDOWS 1
-+#else
-+  #error "eventfd's implementation is not defined"
-+#endif
-+
-+#if TD_TIZEN || TD_LINUX || TD_DARWIN || TD_EMSCRIPTEN
-   #define TD_THREAD_PTHREAD 1
- #else
-   #define TD_THREAD_STL 1
-diff --git a/tdutils/td/utils/port/platform.h b/tdutils/td/utils/port/platform.h
-index 783dd399..a7b19220 100644
---- a/tdutils/td/utils/port/platform.h
-+++ b/tdutils/td/utils/port/platform.h
-@@ -20,6 +20,11 @@
- 
- // clang-format off
- 
-+/*** Determine emscripten ***/
-+#if defined(__EMSCRIPTEN__)
-+  #define TD_EMSCRIPTEN 1
-+#endif
-+
- /*** Platform macros ***/
- #if defined(_WIN32) || defined(_WINDOWS) // _WINDOWS is defined by CMake
-   #if defined(__cplusplus_winrt)
-@@ -63,10 +68,11 @@
-   #define TD_NETBSD 1
- #elif defined(__CYGWIN__)
-   #define TD_CYGWIN 1
--#elif defined(__EMSCRIPTEN__)
--  #define TD_EMSCRIPTEN 1
--#elif defined(__unix__)  // all unices not caught above
--  #warning "Probably unsupported Unix platform. Feel free to try to compile"
-+#elif defined(__unix__) // all unices not caught above
-+  // supress if emscripten
-+  #if !TD_EMSCRIPTEN
-+    #warning "Probably unsupported Unix platform. Feel free to try to compile"
-+  #endif
-   #define TD_CYGWIN 1
- #else
-   #error "Probably unsupported platform. Feel free to remove the error and try to recompile"
-
-From 43517c87a85d3d8e328f95d46be965153116d2ca Mon Sep 17 00:00:00 2001
-From: krigga <krigga7@gmail.com>
-Date: Mon, 20 Feb 2023 19:59:02 +0300
-Subject: [PATCH 4/5] feat: func source and realpath callback
-
----
- crypto/func/func-main.cpp          |  2 ++
- crypto/func/func.cpp               | 24 +++++++++++++++++
- crypto/func/func.h                 | 33 +++++++++++++++++++++++
- crypto/func/parse-func.cpp         | 14 +++++-----
- crypto/funcfiftlib/funcfiftlib.cpp | 43 +++++++++++++++++++++++++++++-
- 5 files changed, 108 insertions(+), 8 deletions(-)
-
-diff --git a/crypto/func/func-main.cpp b/crypto/func/func-main.cpp
-index 45194ea3..cf597cee 100644
---- a/crypto/func/func-main.cpp
-+++ b/crypto/func/func-main.cpp
-@@ -123,5 +123,7 @@ int main(int argc, char* const argv[]) {
-     sources.push_back(std::string(argv[optind++]));
-   }
- 
-+  funC::read_callback = funC::fs_read_callback;
-+
-   return funC::func_proceed(sources, *outs, std::cerr);
- }
-diff --git a/crypto/func/func.cpp b/crypto/func/func.cpp
-index be44d2ea..87bf23e9 100644
---- a/crypto/func/func.cpp
-+++ b/crypto/func/func.cpp
-@@ -30,6 +30,8 @@
- #include "parser/lexer.h"
- #include <getopt.h>
- #include "git.h"
-+#include <fstream>
-+#include "td/utils/port/path.h"
- 
- namespace funC {
- 
-@@ -39,6 +41,28 @@ bool interactive = false;
- GlobalPragma pragma_allow_post_modification{"allow-post-modification"};
- GlobalPragma pragma_compute_asm_ltr{"compute-asm-ltr"};
- std::string generated_from, boc_output_filename;
-+ReadCallback::Callback read_callback;
-+
-+td::Result<std::string> fs_read_callback(ReadCallback::Kind kind, const char* query) {
-+  switch (kind) {
-+    case ReadCallback::Kind::ReadFile: {
-+      std::ifstream ifs{query};
-+      if (ifs.fail()) {
-+        auto msg = std::string{"cannot open source file `"} + query + "`";
-+        return td::Status::Error(msg);
-+      }
-+      std::stringstream ss;
-+      ss << ifs.rdbuf();
-+      return ss.str();
-+    }
-+    case ReadCallback::Kind::Realpath: {
-+      return td::realpath(td::CSlice(query));
-+    }
-+    default: {
-+      return td::Status::Error("Unknown query kind");
-+    }
-+  }
-+}
- 
- /*
-  *
-diff --git a/crypto/func/func.h b/crypto/func/func.h
-index b979afb2..83a28b7d 100644
---- a/crypto/func/func.h
-+++ b/crypto/func/func.h
-@@ -30,6 +30,7 @@
- #include "parser/srcread.h"
- #include "parser/lexer.h"
- #include "parser/symtable.h"
-+#include "td/utils/Status.h"
- 
- namespace funC {
- 
-@@ -845,6 +846,35 @@ extern std::vector<SymDef*> glob_func, glob_vars;
-  * 
-  */
- 
-+class ReadCallback {
-+public:
-+  /// Noncopyable.
-+  ReadCallback(ReadCallback const&) = delete;
-+  ReadCallback& operator=(ReadCallback const&) = delete;
-+
-+  enum class Kind
-+  {
-+    ReadFile,
-+    Realpath
-+  };
-+
-+  static std::string kindString(Kind _kind)
-+  {
-+    switch (_kind)
-+    {
-+    case Kind::ReadFile:
-+      return "source";
-+    case Kind::Realpath:
-+      return "realpath";
-+    default:
-+      throw ""; // todo ?
-+    }
-+  }
-+
-+  /// File reading or generic query callback.
-+  using Callback = std::function<td::Result<std::string>(ReadCallback::Kind, const char*)>;
-+};
-+
- // defined in parse-func.cpp
- bool parse_source(std::istream* is, const src::FileDescr* fdescr);
- bool parse_source_file(const char* filename, src::Lexem lex = {}, bool is_main = false);
-@@ -1691,6 +1721,9 @@ void define_builtins();
- extern int verbosity, indent, opt_level;
- extern bool stack_layout_comments, op_rewrite_comments, program_envelope, asm_preamble, interactive;
- extern std::string generated_from, boc_output_filename;
-+extern ReadCallback::Callback read_callback;
-+
-+td::Result<std::string> fs_read_callback(ReadCallback::Kind kind, const char* query);
- 
- class GlobalPragma {
-  public:
-diff --git a/crypto/func/parse-func.cpp b/crypto/func/parse-func.cpp
-index 011947d5..b1be66ff 100644
---- a/crypto/func/parse-func.cpp
-+++ b/crypto/func/parse-func.cpp
-@@ -22,8 +22,6 @@
- #include "openssl/digest.hpp"
- #include "block/block.h"
- #include "block-parse.h"
--#include <fstream>
--#include "td/utils/port/path.h"
- 
- namespace sym {
- 
-@@ -1757,7 +1755,7 @@ bool parse_source_file(const char* filename, src::Lexem lex, bool is_main) {
+diff --git a/crypto/block/transaction.cpp b/crypto/block/transaction.cpp
+index fcabf0c09..fc481032a 100644
+--- a/crypto/block/transaction.cpp
++++ b/crypto/block/transaction.cpp
+@@ -1067,14 +1067,17 @@ bool Transaction::prepare_compute_phase(const ComputePhaseConfig& cfg) {
+   std::unique_ptr<StringLoggerTail> logger;
+   auto vm_log = vm::VmLog();
+   if (cfg.with_vm_log) {
+-    size_t log_max_size = cfg.vm_log_verbosity > 0 ? 1024 * 1024 : 256;
++    size_t log_max_size = cfg.vm_log_verbosity > 0 ? 1024 * 1024 * 1024 : 256;
+     logger = std::make_unique<StringLoggerTail>(log_max_size);
+     vm_log.log_interface = logger.get();
+     vm_log.log_options = td::LogOptions(VERBOSITY_NAME(DEBUG), true, false);
+     if (cfg.vm_log_verbosity > 1) {
+       vm_log.log_mask |= vm::VmLog::ExecLocation;
+       if (cfg.vm_log_verbosity > 2) {
+-        vm_log.log_mask |= vm::VmLog::DumpStack | vm::VmLog::GasRemaining;
++        vm_log.log_mask |= vm::VmLog::GasRemaining;
++        if (cfg.vm_log_verbosity > 3) {
++            // vm_log.log_mask |= vm::VmLog::DumpStack;
++        }
+       }
      }
    }
- 
--  auto path_res = td::realpath(td::CSlice(filename));
-+  auto path_res = read_callback(ReadCallback::Kind::Realpath, filename);
-   if (path_res.is_error()) {
-     auto error = path_res.move_as_error();
-     lex.error(error.message().c_str());
-@@ -1784,17 +1782,19 @@ bool parse_source_file(const char* filename, src::Lexem lex, bool is_main) {
-   source_files[real_filename] = cur_source;
-   cur_source->is_main = is_main;
-   source_fdescr.push_back(cur_source);
--  std::ifstream ifs{filename};
--  if (ifs.fail()) {
--    auto msg = std::string{"cannot open source file `"} + filename + "`";
-+  auto file_res = read_callback(ReadCallback::Kind::ReadFile, filename);
-+  if (file_res.is_error()) {
-+    auto msg = file_res.move_as_error().message().str();
-     if (lex.tp) {
-       lex.error(msg);
-     } else {
-       throw src::Fatal{msg};
-     }
-   }
-+  auto file_str = file_res.move_as_ok();
-+  std::stringstream ss{file_str};
-   inclusion_locations.push(lex.loc);
--  bool res = parse_source(&ifs, cur_source);
-+  bool res = parse_source(&ss, cur_source);
-   inclusion_locations.pop();
-   return res;
- }
-diff --git a/crypto/funcfiftlib/funcfiftlib.cpp b/crypto/funcfiftlib/funcfiftlib.cpp
-index 6c8912bc..070c3e0d 100644
---- a/crypto/funcfiftlib/funcfiftlib.cpp
-+++ b/crypto/funcfiftlib/funcfiftlib.cpp
-@@ -30,6 +30,7 @@
- #include "td/utils/JsonBuilder.h"
- #include "fift/utils.h"
- #include "td/utils/base64.h"
-+#include "td/utils/Status.h"
- #include <sstream>
- #include <iomanip>
- 
-@@ -99,6 +100,40 @@ td::Result<std::string> compile_internal(char *config_json) {
-   return result_json.string_builder().as_cslice().str();
- }
- 
-+/// Callback used to retrieve additional source files or data.
-+///
-+/// @param _kind The kind of callback (a string).
-+/// @param _data The data for the callback (a string).
-+/// @param o_contents A pointer to the contents of the file, if found. Allocated via malloc().
-+/// @param o_error A pointer to an error message, if there is one. Allocated via malloc().
-+///
-+/// The callback implementor must use malloc() to allocate storage for
-+/// contents or error. The callback implementor must use free() to free
-+/// said storage after func_compile returns.
-+///
-+/// If the callback is not supported, *o_contents and *o_error must be set to NULL.
-+typedef void (*CStyleReadFileCallback)(char const* _kind, char const* _data, char** o_contents, char** o_error);
-+
-+funC::ReadCallback::Callback wrapReadCallback(CStyleReadFileCallback _readCallback)
-+{
-+  funC::ReadCallback::Callback readCallback;
-+  if (_readCallback) {
-+    readCallback = [=](funC::ReadCallback::Kind _kind, char const* _data) -> td::Result<std::string> {
-+      char* contents_c = nullptr;
-+      char* error_c = nullptr;
-+      _readCallback(funC::ReadCallback::kindString(_kind).data(), _data, &contents_c, &error_c);
-+      if (!contents_c && !error_c) {
-+        return td::Status::Error("Callback not supported");
-+      }
-+      if (contents_c) {
-+        return contents_c;
-+      }
-+      return td::Status::Error(std::string(error_c));
-+    };
-+  }
-+  return readCallback;
-+}
-+
- extern "C" {
- 
- const char* version() {
-@@ -111,7 +146,13 @@ const char* version() {
-   return strdup(version_json.string_builder().as_cslice().c_str());
- }
- 
--const char *func_compile(char *config_json) {
-+const char *func_compile(char *config_json, CStyleReadFileCallback callback) {
-+  if (callback) {
-+    funC::read_callback = wrapReadCallback(callback);
-+  } else {
-+    funC::read_callback = funC::fs_read_callback;
-+  }
-+
-   auto res = compile_internal(config_json);
- 
-   if (res.is_error()) {
 
-From 090cced84a32d139b653b228de3c240a00d90d1a Mon Sep 17 00:00:00 2001
-From: krigga <krigga7@gmail.com>
-Date: Mon, 20 Feb 2023 20:13:04 +0300
-Subject: [PATCH 5/5] fix: invalid fift compilation exceptions
+From e9b87e00c2959b6968156213aa39c484a6c9b4f1 Mon Sep 17 00:00:00 2001
+From: Steve Korshakov <korshakov.stepan@gmail.com>
+Date: Fri, 14 Apr 2023 13:55:40 +0100
+Subject: [PATCH 2/2] Improve emulator performance and allow memory growth
 
 ---
- crypto/CMakeLists.txt | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ emulator/CMakeLists.txt | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/crypto/CMakeLists.txt b/crypto/CMakeLists.txt
-index 42bb9f9b..c8ed0f5b 100644
---- a/crypto/CMakeLists.txt
-+++ b/crypto/CMakeLists.txt
-@@ -296,6 +296,10 @@ target_link_libraries(test-ed25519-crypto PUBLIC ton_crypto)
- add_library(fift-lib ${FIFT_SOURCE})
- target_include_directories(fift-lib PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
- target_link_libraries(fift-lib PUBLIC ton_crypto ton_db tdutils ton_block)
-+if (USE_EMSCRIPTEN)
-+  target_link_options(fift-lib PRIVATE -fexceptions)
-+  target_compile_options(fift-lib PRIVATE -fexceptions)
-+endif()
- set_target_properties(fift-lib PROPERTIES OUTPUT_NAME fift)
- 
- add_executable(fift fift/fift-main.cpp)
-@@ -336,7 +340,8 @@ if (USE_EMSCRIPTEN)
-   target_link_options(funcfiftlib PRIVATE -sALLOW_MEMORY_GROWTH=1)
-   target_link_options(funcfiftlib PRIVATE -sALLOW_TABLE_GROWTH=1)
-   target_link_options(funcfiftlib PRIVATE --embed-file ${CMAKE_CURRENT_SOURCE_DIR}/fift/lib@/fiftlib)
--  target_compile_options(funcfiftlib PRIVATE -sDISABLE_EXCEPTION_CATCHING=0)
-+  target_link_options(funcfiftlib PRIVATE -fexceptions)
-+  target_compile_options(funcfiftlib PRIVATE -fexceptions)
- endif()
- 
- add_executable(tlbc tl/tlbc.cpp)
- 
+diff --git a/emulator/CMakeLists.txt b/emulator/CMakeLists.txt
+index 4e67d32cc..d5ef3dfb9 100644
+--- a/emulator/CMakeLists.txt
++++ b/emulator/CMakeLists.txt
+@@ -44,13 +44,15 @@ if (USE_EMSCRIPTEN)
+   target_link_options(emulator-emscripten PRIVATE -sEXPORTED_FUNCTIONS=_emulate,_free,_run_get_method)
+   target_link_options(emulator-emscripten PRIVATE -sEXPORT_NAME=EmulatorModule)
+   target_link_options(emulator-emscripten PRIVATE -sERROR_ON_UNDEFINED_SYMBOLS=0)
+-  target_link_options(emulator-emscripten PRIVATE -Oz)
++  target_link_options(emulator-emscripten PRIVATE -O3)
+   target_link_options(emulator-emscripten PRIVATE -sIGNORE_MISSING_MAIN=1)
+   target_link_options(emulator-emscripten PRIVATE -sAUTO_NATIVE_LIBRARIES=0)
+   target_link_options(emulator-emscripten PRIVATE -sMODULARIZE=1)
+   target_link_options(emulator-emscripten PRIVATE -sENVIRONMENT=web)
+   target_link_options(emulator-emscripten PRIVATE -sFILESYSTEM=0)
+   target_link_options(emulator-emscripten PRIVATE -fexceptions)
++  target_link_options(emulator-emscripten PRIVATE -sALLOW_MEMORY_GROWTH=1)
++  target_link_options(emulator-emscripten PRIVATE -sALLOW_TABLE_GROWTH=1)
+   if (USE_EMSCRIPTEN_NO_WASM)
+     target_link_options(emulator-emscripten PRIVATE -sWASM=0)
+   endif()
